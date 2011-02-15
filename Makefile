@@ -1,7 +1,9 @@
 ﻿CC=gcc
 LD=gcc
-CFLAGS=
-LDFLAGS=
+CFLAGS=-O2
+LDFLAGS=-O2 -s -mwindows
+#CFLAGS=-ggdb3
+#LDFLAGS=-ggdb3 -mwindows
 LIBS=-lshlwapi -lgdi32
 
 spg.exe:	polish.o english.o spg.o
@@ -14,5 +16,5 @@ english.o:	english.c
 polish.o:	english.c
 
 clean:
-	@rm -f *.o *.exe
-	@del *.o *.exe
+	-rm -f *.o *.exe
+	-del *.o *.exe
