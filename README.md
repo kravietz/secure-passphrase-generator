@@ -16,7 +16,7 @@ In one run 20 passphrases are generated so that you can choose one that looks be
 
 # Security
 
-With passphrase lengths ranging from 19 to 27 characters classic bruteforce attacks are unfeasible. The only feasible attack is dictionary attack trying all combinations (10^{17} to 10^{18}) of words from the dictionary. Complexity of this attack is larger than in case of classical alphanumeric password of 8 characters (10^14). Expressed in information entropy, average entropy of each passphrase is 52-56 bits, depending on dictionary size (compared to around 48 of alphanumeric 8 characters password)
+With passphrase lengths ranging from 19 to 27 characters classic bruteforce attacks are unfeasible. The only feasible attack is dictionary attack trying all combinations (around 10^17) of words from the dictionary. Complexity of this attack is larger than in case of classical alphanumeric password of 8 characters (10^14). Expressed in information entropy, average entropy of each passphrase is 52-56 bits, depending on dictionary size (compared to around 48 of alphanumeric 8 characters password)
 
 # Cryptography details
 
