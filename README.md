@@ -1,4 +1,4 @@
-# Secure Passphrase Generator (SPG)
+﻿# Secure Passphrase Generator (SPG)
 
 SPG is a simple GUI program to generate random passphrases out of dictionaries in various languages. These passphrases are both easier to remember and stronger than most classical passwords composed of alphanumeric characters.
 
@@ -8,13 +8,15 @@ Currently Polish and English dictionaries are included. They are built into the 
 
 In one run 20 passphrases are generated so that you can choose one that looks best for you. Random separators between words are used to further strengthen these passphrases against bruteforce attacks. Sample:
 
-`Selma-Gybe-Lane-Intake
-Award!Lang!Gross!Lift
-Castor=Harms=Wound=Yacc`
+`Selma-Gybe-Lane-Intake`
+
+`Award!Lang!Gross!Lift`
+
+`Castor=Harms=Wound=Yacc`
 
 # Security
 
-With passphrase lengths ranging from 19 to 27 characters classic bruteforce attacks are unfeasible. The only feasible attack is dictionary attack trying all combinations (-) of words from the dictionary. Complexity of this attack is larger than in case of classical alphanumeric password of 8 characters (). Expressed in information entropy, average entropy of each passphrase is 52-56 bits, depending on dictionary size (compared to around 48 of alphanumeric 8 characters password)
+With passphrase lengths ranging from 19 to 27 characters classic bruteforce attacks are unfeasible. The only feasible attack is dictionary attack trying all combinations (10^17-10^18) of words from the dictionary. Complexity of this attack is larger than in case of classical alphanumeric password of 8 characters (10^14). Expressed in information entropy, average entropy of each passphrase is 52-56 bits, depending on dictionary size (compared to around 48 of alphanumeric 8 characters password)
 
 # Cryptography details
 
@@ -24,3 +26,7 @@ This program fully relies on Windows Cryptographic API (CryptGenRandom) to gener
 
 * 1.0		initial version, compiled with MinGW
 * 1.1		Unicode based, compiled with Visual Studio 2010
+
+# Author
+
+SPG was written by Paweł Krawczyk <pawel.krawczyk@hush.com> http://ipsec.pl/passphrase
