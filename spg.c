@@ -31,16 +31,24 @@ Licensing: http://creativecommons.org/licenses/BSD/
 #include <stdio.h>
 #include <ctype.h>
 #include <Shlwapi.h>
-#include <Commctrl.h>
+#include <CommCtrl.h>
 
+// These Str* functions are defined and implemented in strsafe.h
 #if defined(__GNUC__)
-#include <string.h>
-#define StringCchPrintfW swprintf
-#define StringCchCatW wcsncat
-#define StrDup wcsdup
+# include <string.h>
+# include <stdlib.h>
+# define StringCchPrintfW _snwprintf
+# define StringCchCatW(dest, size, src) wcsncat(dest, src, size) // note swapped args
+# ifndef StrDup
+#  define StrDup wcsdup
+# endif
+# ifndef STATUSCLASSNAME
+#  define STATUSCLASSNAME L"msctls_statusbar32"
+# endif
 #else
-#include <strsafe.h>
+# include <strsafe.h>
 #endif
+
 
 #define ERRCHECK(ret, msg) if(ret) { \
 					LPVOID lpMsgBuf; \
@@ -140,7 +148,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						
 				// STATUS BAR
 				
-				hStatus = CreateWindowEx(WS_EX_CLIENTEDGE, L"Static", NULL, 
+				hStatus = CreateWindowEx(0, L"Edit", NULL, //* XXX This should be STATUSCLASSNAME */
 					WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0,
 									hwnd, (HMENU)IDC_MAIN_STATUS, GetModuleHandle(NULL), NULL);
 				ERRCHECK((hStatus==NULL), L"Could not create status bar")
@@ -246,30 +254,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						StringCchPrintfW(separator, sizeof(separator), L"%c", separators[rand_index(hwnd, hCryptProv, sizeof(separators))]);
 						/* Loop to generate one passphrase composed of NW words */
 						for(num_words=0; num_words<NUM_WORDS; num_words++) {
+							/* Produce random index between 0 and number of words in dictionary */
 							rIndex = rand_index(hwnd, hCryptProv, numWords);
-/* Alternatives for MinGW */
-#if defined(__GNUC__)
-#else
+							/* Select random word from dictionary; result="word" */
 							word = StrDup(words[rIndex]);
-#endif
-							word[0] = toupper(word[0]);
-#if defined(__GNUC__)
-#else
+							/* Capitalise first letter; result="Word" */
+							word[0] = towupper(word[0]);
 							// Append new word to passphrase
 							StringCchCatW(passphrase, sizeof(passphrase), word);
-#endif
 							LocalFree(word);
 							// Append separator if any words to follow
 							if(num_words< (NUM_WORDS-1))
 								StringCchCatW(passphrase, sizeof(passphrase), separator);
-						}
-#if defined(__GNUC__)
-#else
+						} /* end of single passphrase generation */
 						// Append newly generated passphrase to end of list with CRLF
 						StringCchCatW(window_output, sizeof(window_output), passphrase);
 						StringCchCatW(window_output, sizeof(window_output), L"\r\n");
-#endif
-					}
+					} /* end of passphrase list generation */
 					// Print to edit window
 					SetDlgItemText(hwnd, IDC_MAIN_EDIT, window_output);
 				}
