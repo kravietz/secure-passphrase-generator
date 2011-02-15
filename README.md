@@ -16,11 +16,11 @@ In one run 20 passphrases are generated so that you can choose one that looks be
 
 # Security
 
-With passphrase lengths ranging from 19 to 27 characters classic bruteforce attacks are unfeasible. The only feasible attack is dictionary attack trying all combinations (10^17-10^18) of words from the dictionary. Complexity of this attack is larger than in case of classical alphanumeric password of 8 characters (10^14). Expressed in information entropy, average entropy of each passphrase is 52-56 bits, depending on dictionary size (compared to around 48 of alphanumeric 8 characters password)
+With passphrase lengths ranging from 19 to 27 characters classic bruteforce attacks are unfeasible. The only feasible attack is dictionary attack trying all combinations (10^{17} to 10^{18}) of words from the dictionary. Complexity of this attack is larger than in case of classical alphanumeric password of 8 characters (10^14). Expressed in information entropy, average entropy of each passphrase is 52-56 bits, depending on dictionary size (compared to around 48 of alphanumeric 8 characters password)
 
 # Cryptography details
 
-This program fully relies on Windows Cryptographic API (CryptGenRandom) to generate passhprase. It doesn't implement any own algorithms. On startup, it will try to load strongest cryptographic suite available in host operating system (and will accept only PROV_RSA_AES or PROV_RSA_FULL). Dictionary is randomly indexed using "simple discard method" from NIST SP800-90 (B.5.1.1).
+This program fully relies on Windows Cryptographic API (CryptGenRandom) to generate passhprase. It doesn not implement any own algorithms. On startup, it will try to load strongest cryptographic suite available in host operating system (and will accept only PROV_RSA_AES or PROV_RSA_FULL). Dictionary is randomly indexed using "simple discard method" from NIST SP800-90 (B.5.1.1).
 
 # Release history
 
