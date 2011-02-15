@@ -81,6 +81,7 @@ const WCHAR g_szClassName[] = L"myWindowClass";
 /* This function implements B.5.1.1 Simple Discard Method from NIST SP800-90
  * http://csrc.nist.gov/publications/nistpubs/800-90/SP800-90revised_March2007.pdf
  */
+/*
 LONG rand_index(HWND hwnd, HCRYPTPROV hCryptProv, LONG max) {
 	LONG randInput;	
 	LONG upperLimitBytes;
@@ -97,6 +98,40 @@ LONG rand_index(HWND hwnd, HCRYPTPROV hCryptProv, LONG max) {
 		randInput = 0L;
 		retVal = CryptGenRandom(hCryptProv, upperLimitBytes, (BYTE *) &randInput);
 		ERRCHECK((!retVal), L"CryptGenRandom")
+		loops++;
+		if(randInput < max) break; // found!
+	}
+	iCallsNum++;
+	iTotalLoopsNum += loops;
+	iLoopsAvg = iTotalLoopsNum/iCallsNum;
+	// average number of iterations is counter purely for debugging purposes
+	// and not displayed anywhere
+	return randInput;
+}
+*/
+LONG rand_index(IN HWND hwnd, IN HCRYPTPROV hCryptProv, IN LONG max) {
+	OUT LONG randInput;	
+	static LONG iCallsNum = 0, iTotalLoopsNum = 0;
+	static DOUBLE iLoopsAvg = 0.0;
+	static LONG iContinousRndTest = 0L;
+	LONG upperLimitBytes;
+	LONG loops = 0;
+	DOUBLE upperLimitBits;
+	
+	upperLimitBits = ceil(log(max) / log(2));
+	upperLimitBytes = (LONG) ceil(upperLimitBits/8);
+
+	while(1) {
+		LONG retVal;
+		randInput = 0L;
+		retVal = CryptGenRandom(hCryptProv, upperLimitBytes, (BYTE *) &randInput));
+		ERRCHECK((!retVal), L"CryptGenRandom")
+		/* FIPS 140-2 p. 44 Continuous random number generator test */
+		if(upperLimitBits > 15 && randInput == iContinousRndTest) {
+			MessageBox(hwnd, L"Random numbers are not sufficient quality!", L"FIPS 140-2 Continuous Random Test", MB_OK | MB_ICONERROR);
+			DestroyWindow(hwnd);
+		}
+		iContinousRndTest = randInput;
 		loops++;
 		if(randInput < max) break; // found!
 	}
@@ -148,7 +183,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						
 				// STATUS BAR
 				
-				hStatus = CreateWindowEx(0, L"Edit", NULL, //* XXX This should be STATUSCLASSNAME */
+				hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, //* XXX This should be STATUSCLASSNAME */
 					WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0,
 									hwnd, (HMENU)IDC_MAIN_STATUS, GetModuleHandle(NULL), NULL);
 				ERRCHECK((hStatus==NULL), L"Could not create status bar")
