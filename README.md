@@ -1,4 +1,5 @@
-﻿# Secure Passphrase Generator (SPG)
+﻿
+# Secure Passphrase Generator (SPG)
 
 SPG is a simple GUI program to generate random passphrases out of dictionaries in various languages. These passphrases are both easier to remember and stronger than most classical passwords composed of alphanumeric characters.
 
