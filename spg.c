@@ -49,7 +49,6 @@ Licensing: http://creativecommons.org/licenses/BSD/
 # include <strsafe.h>
 #endif
 
-
 #define ERRCHECK(ret, msg) if(ret) { \
 					LPVOID lpMsgBuf; \
 					DWORD dw = GetLastError(); \
@@ -124,7 +123,7 @@ LONG rand_index(IN HWND hwnd, IN HCRYPTPROV hCryptProv, IN LONG max) {
 	while(1) {
 		LONG retVal;
 		randInput = 0L;
-		retVal = CryptGenRandom(hCryptProv, upperLimitBytes, (BYTE *) &randInput));
+		retVal = CryptGenRandom(hCryptProv, upperLimitBytes, (BYTE *) &randInput);
 		ERRCHECK((!retVal), L"CryptGenRandom")
 		/* FIPS 140-2 p. 44 Continuous random number generator test */
 		if(upperLimitBits > 15 && randInput == iContinousRndTest) {
@@ -363,6 +362,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     WNDCLASSEX wc;
     HWND hwnd;
     MSG Msg;
+	INITCOMMONCONTROLSEX icex;
+
+	//  STATUSCLASSNAME will fail without this
+	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    icex.dwICC  = ICC_BAR_CLASSES | ICC_STANDARD_CLASSES;
+    InitCommonControlsEx(&icex); 
 
     //Step 1: Registering the Window Class
     wc.cbSize        = sizeof(WNDCLASSEX);
