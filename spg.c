@@ -9,7 +9,7 @@ Licensing: http://creativecommons.org/licenses/BSD/
 #define UNICODE
 #endif
 
-#define ABOUT_TEXT	L"Secure Passphrase Generator 1.1\r\n"   \
+#define ABOUT_TEXT	L"Secure Passphrase Generator 1.2\r\n"   \
 					L"Copyright by Pawel Krawczyk 2010-2011\r\n"  \
 					L"Home: http://ipsec.pl/passphrase\r\n"  \
 					L"Licensing: http://creativecommons.org/licenses/BSD/"
@@ -362,12 +362,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     WNDCLASSEX wc;
     HWND hwnd;
     MSG Msg;
-	INITCOMMONCONTROLSEX icex;
+    INITCOMMONCONTROLSEX icex;
 
-	//  STATUSCLASSNAME will fail without this
-	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    // STATUSCLASSNAME will fail without InitCommonControls	
+	// and this ifdef is needed for MinGW
+#ifdef InitCommonControlsEx
+    icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
     icex.dwICC  = ICC_BAR_CLASSES | ICC_STANDARD_CLASSES;
     InitCommonControlsEx(&icex); 
+#else
+    InitCommonControls(); 
+#endif
 
     //Step 1: Registering the Window Class
     wc.cbSize        = sizeof(WNDCLASSEX);
