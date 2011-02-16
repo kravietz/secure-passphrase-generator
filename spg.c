@@ -80,34 +80,6 @@ const WCHAR g_szClassName[] = L"myWindowClass";
 /* This function implements B.5.1.1 Simple Discard Method from NIST SP800-90
  * http://csrc.nist.gov/publications/nistpubs/800-90/SP800-90revised_March2007.pdf
  */
-/*
-LONG rand_index(HWND hwnd, HCRYPTPROV hCryptProv, LONG max) {
-	LONG randInput;	
-	LONG upperLimitBytes;
-	DOUBLE upperLimitBits;
-	static LONG iCallsNum = 0, iTotalLoopsNum = 0;
-	static DOUBLE iLoopsAvg = 0.0;
-	LONG loops = 0;
-	
-	upperLimitBits = ceil(log(max) / log(2));
-	upperLimitBytes = (LONG) ceil(upperLimitBits/8);
-
-	while(1) {
-		LONG retVal;
-		randInput = 0L;
-		retVal = CryptGenRandom(hCryptProv, upperLimitBytes, (BYTE *) &randInput);
-		ERRCHECK((!retVal), L"CryptGenRandom")
-		loops++;
-		if(randInput < max) break; // found!
-	}
-	iCallsNum++;
-	iTotalLoopsNum += loops;
-	iLoopsAvg = iTotalLoopsNum/iCallsNum;
-	// average number of iterations is counter purely for debugging purposes
-	// and not displayed anywhere
-	return randInput;
-}
-*/
 LONG rand_index(IN HWND hwnd, IN HCRYPTPROV hCryptProv, IN LONG max) {
 	OUT LONG randInput;	
 	static LONG iCallsNum = 0, iTotalLoopsNum = 0;
@@ -120,20 +92,26 @@ LONG rand_index(IN HWND hwnd, IN HCRYPTPROV hCryptProv, IN LONG max) {
 	upperLimitBits = ceil(log(max) / log(2));
 	upperLimitBytes = (LONG) ceil(upperLimitBits/8);
 
+	/* Simple discard methods is basically to produce 
+	   random LONG until it fits in out 0..MAX range
+	   */
 	while(1) {
 		LONG retVal;
-		randInput = 0L;
+		randInput = 0L; /* overwrite whatever was there */
 		retVal = CryptGenRandom(hCryptProv, upperLimitBytes, (BYTE *) &randInput);
 		ERRCHECK((!retVal), L"CryptGenRandom")
 		/* FIPS 140-2 p. 44 Continuous random number generator test */
+		/* Check if previous number wasn't the same as current */
 		if(upperLimitBits > 15 && randInput == iContinousRndTest) {
-			MessageBox(hwnd, L"Random numbers are not sufficient quality!", L"FIPS 140-2 Continuous Random Test", MB_OK | MB_ICONERROR);
+			/* Can't use ERRCHECK here because there's no system error */
+			MessageBox(hwnd, L"Random numbers are not sufficient quality!", L"Continuous Random Test", MB_OK | MB_ICONERROR);
 			DestroyWindow(hwnd);
 		}
-		iContinousRndTest = randInput;
+		iContinousRndTest = randInput; /* preserve this value for continuous test */
 		loops++;
 		if(randInput < max) break; // found!
 	}
+	/* update statistics */
 	iCallsNum++;
 	iTotalLoopsNum += loops;
 	iLoopsAvg = iTotalLoopsNum/iCallsNum;
@@ -366,7 +344,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     // STATUSCLASSNAME will fail without InitCommonControls	
 	// and this ifdef is needed for MinGW
-#ifdef InitCommonControlsEx
+#ifndef __GNUC__
     icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
     icex.dwICC  = ICC_BAR_CLASSES | ICC_STANDARD_CLASSES;
     InitCommonControlsEx(&icex); 
