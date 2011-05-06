@@ -9,7 +9,7 @@ Licensing: http://creativecommons.org/licenses/BSD/
 #define UNICODE
 #endif
 
-#define ABOUT_TEXT	L"Secure Passphrase Generator 1.2\r\n"   \
+#define ABOUT_TEXT	L"Secure Passphrase Generator 1.3\r\n"   \
 					L"Copyright by Pawel Krawczyk <pawel.krawczyk@hush.com> 2010-2011\r\n"  \
 					L"Home: http://ipsec.pl/passphrase\r\n"  \
 					L"License: http://creativecommons.org/licenses/BSD/"
