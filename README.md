@@ -23,11 +23,6 @@ With passphrase lengths ranging from 19 to 27 characters classic bruteforce atta
 
 This program fully relies on Windows Cryptographic API (CryptGenRandom) to generate passhprase. It doesn not implement any own algorithms. On startup, it will try to load strongest cryptographic suite available in host operating system (and will accept only PROV_RSA_AES or PROV_RSA_FULL). Dictionary is randomly indexed using "simple discard method" from NIST SP800-90 (B.5.1.1).
 
-# Release history
-
-* 1.0		initial version, compiled with MinGW
-* 1.1		Unicode based, compiled with Visual Studio 2010
-
 # Author
 
 SPG was written by Paweł Krawczyk <pawel.krawczyk@hush.com> http://ipsec.pl/passphrase
