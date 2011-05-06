@@ -38,6 +38,7 @@
 								<option id="gnu.cpp.link.option.libs.281021638" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="gdi32"/>
 									<listOptionValue builtIn="false" value="shlwapi"/>
+									<listOptionValue builtIn="false" value="Comctl32"/>
 								</option>
 								<option id="gnu.cpp.link.option.flags.237182127" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-mwindows -g3" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.426751892" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
@@ -504,6 +505,7 @@
 								<option id="gnu.cpp.link.option.libs.493545060" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="gdi32"/>
 									<listOptionValue builtIn="false" value="shlwapi"/>
+									<listOptionValue builtIn="false" value="Comctl32"/>
 								</option>
 								<option id="gnu.cpp.link.option.strip.285898071" name="Omit all symbol information (-s)" superClass="gnu.cpp.link.option.strip" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1632109516" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">

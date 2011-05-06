@@ -10,9 +10,9 @@ Licensing: http://creativecommons.org/licenses/BSD/
 #endif
 
 #define ABOUT_TEXT	L"Secure Passphrase Generator 1.2\r\n"   \
-					L"Copyright by Pawel Krawczyk 2010-2011\r\n"  \
+					L"Copyright by Pawel Krawczyk <pawel.krawczyk@hush.com> 2010-2011\r\n"  \
 					L"Home: http://ipsec.pl/passphrase\r\n"  \
-					L"Licensing: http://creativecommons.org/licenses/BSD/"
+					L"License: http://creativecommons.org/licenses/BSD/"
 					
 #define NUM_WORDS			4									/* how many words in passphrase? */
 #define NUM_PASS			20									/* how many passphrases to display in one run */
@@ -160,7 +160,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						
 				// STATUS BAR
 				
-				hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, //* XXX This should be STATUSCLASSNAME */
+				hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL,
 					WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0,
 									hwnd, (HMENU)IDC_MAIN_STATUS, GetModuleHandle(NULL), NULL);
 				ERRCHECK((hStatus==NULL), L"Could not create status bar")
@@ -179,16 +179,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				static HCRYPTPROV hCryptProv;
 				static size_t numWords;
 				static LPCWSTR *words;
+				static LPCWSTR cryptProvName = L"NONE";
 				HWND hStatus;
+				LPCWSTR pszContainer = L"SpgKeyContainer";
 				
 				case ID_INIT:
 					// Initialize or re-initialize after language change
 					// First try CryptoAPI RSA_AES provider, then RSA_FULL, fail if none is available
-					if(!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_AES, 0))  {
-						if(!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, 0))  {
-							MessageBox(hwnd, L"CryptAcquireContext failed", L"CryptAcquireContext", MB_OK | MB_ICONERROR);
-							DestroyWindow(hwnd);
+					// For some reason CryptoAPI requires a key container to be initialized even
+					// for rng generation so we need to initialize and/or open a dummy key container
+					if(CryptAcquireContext(&hCryptProv, pszContainer, NULL, PROV_RSA_AES, 0))
+						cryptProvName = L"RSA_AES";
+					else {
+						// RSA_AES - maybe we need to create new container?
+						if(CryptAcquireContext(&hCryptProv, pszContainer, NULL, PROV_RSA_AES, CRYPT_NEWKEYSET))
+						cryptProvName = L"RSA_AES";
+						else {
+							// Nope, let's try the same with RSA_FULL
+							if(CryptAcquireContext(&hCryptProv, pszContainer, NULL, PROV_RSA_FULL, 0))
+							cryptProvName = L"RSA_FULL";
+							else {
+									// Last resort...
+									LONG retVal;
+									retVal = CryptAcquireContext(&hCryptProv, pszContainer, NULL, PROV_RSA_FULL, CRYPT_NEWKEYSET);
+									ERRCHECK((!retVal), L"CryptAcquireContext");
+									cryptProvName = L"RSA_FULL";
+							}
 						}
+
 					}
 					// Change status after (re)init
 					if(language == ID_LANG_PL) {
@@ -209,14 +227,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						WCHAR msg[1000];
 						LPCWSTR lang;
 						DOUBLE ent;
-						LPCWSTR template = L"Dict: %s   Entropy: %.2f";
+						LPCWSTR template = L"Dict: %s   Entropy: %.2f   Rng: %s";
 						
 						if(language == ID_LANG_PL) lang=L"Polish";
 						if(language == ID_LANG_EN) lang=L"English";
 						
 						// Information entropy calculation
 						ent = ENTROPY_FORMULA; /* this is defined on top so can be audited easily */
-						StringCchPrintfW(msg, sizeof(msg), template, lang, ent);
+						StringCchPrintfW(msg, sizeof(msg), template, lang, ent, cryptProvName);
 
 						hStatus = GetDlgItem(hwnd, IDC_MAIN_STATUS);
 						ERRCHECK((hStatus == NULL), L"Could not update status bar")
@@ -340,11 +358,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     WNDCLASSEX wc;
     HWND hwnd;
     MSG Msg;
+#ifndef __GNUC__
     INITCOMMONCONTROLSEX icex;
 
     // STATUSCLASSNAME will fail without InitCommonControls	
 	// and this ifdef is needed for MinGW
-#ifndef __GNUC__
+
     icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
     icex.dwICC  = ICC_BAR_CLASSES | ICC_STANDARD_CLASSES;
     InitCommonControlsEx(&icex); 
