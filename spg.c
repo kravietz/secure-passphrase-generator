@@ -9,7 +9,7 @@ Licensing: http://creativecommons.org/licenses/BSD/
 #define UNICODE
 #endif
 
-#define ABOUT_TEXT	L"Secure Passphrase Generator 1.3\r\n"   \
+#define ABOUT_TEXT	L"Secure Passphrase Generator 1.4\r\n"   \
 					L"Copyright by Pawel Krawczyk <pawel.krawczyk@hush.com> 2010-2011\r\n"  \
 					L"Home: http://ipsec.pl/passphrase\r\n"  \
 					L"License: http://creativecommons.org/licenses/BSD/"
@@ -181,32 +181,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				static LPCWSTR *words;
 				static LPCWSTR cryptProvName = L"NONE";
 				HWND hStatus;
-				LPCWSTR pszContainer = L"SpgKeyContainer";
 				
 				case ID_INIT:
 					// Initialize or re-initialize after language change
 					// First try CryptoAPI RSA_AES provider, then RSA_FULL, fail if none is available
-					// For some reason CryptoAPI requires a key container to be initialized even
-					// for rng generation so we need to initialize and/or open a dummy key container
-					if(CryptAcquireContext(&hCryptProv, pszContainer, NULL, PROV_RSA_AES, 0))
+					if(CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 						cryptProvName = L"RSA_AES";
 					else {
-						// RSA_AES - maybe we need to create new container?
-						if(CryptAcquireContext(&hCryptProv, pszContainer, NULL, PROV_RSA_AES, CRYPT_NEWKEYSET))
-						cryptProvName = L"RSA_AES";
-						else {
-							// Nope, let's try the same with RSA_FULL
-							if(CryptAcquireContext(&hCryptProv, pszContainer, NULL, PROV_RSA_FULL, 0))
-							cryptProvName = L"RSA_FULL";
-							else {
-									// Last resort...
-									LONG retVal;
-									retVal = CryptAcquireContext(&hCryptProv, pszContainer, NULL, PROV_RSA_FULL, CRYPT_NEWKEYSET);
-									ERRCHECK((!retVal), L"CryptAcquireContext");
-									cryptProvName = L"RSA_FULL";
-							}
-						}
-
+						// Try RSA_FULL and fail if it's not available
+						LONG retVal;
+						retVal = CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL , CRYPT_VERIFYCONTEXT);
+						ERRCHECK((!retVal), L"CryptAcquireContext");
+						cryptProvName = L"RSA_FULL";
 					}
 					// Change status after (re)init
 					if(language == ID_LANG_PL) {
