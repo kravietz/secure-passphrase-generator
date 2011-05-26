@@ -79,6 +79,7 @@ const WCHAR g_szClassName[] = L"myWindowClass";
 
 /* This function implements B.5.1.1 Simple Discard Method from NIST SP800-90
  * http://csrc.nist.gov/publications/nistpubs/800-90/SP800-90revised_March2007.pdf
+ * Simple discard method is used to produce random LONG until it fits in out 0..MAX range
  */
 LONG rand_index(IN HWND hwnd, IN HCRYPTPROV hCryptProv, IN LONG max) {
 	OUT LONG randInput;	
@@ -92,9 +93,6 @@ LONG rand_index(IN HWND hwnd, IN HCRYPTPROV hCryptProv, IN LONG max) {
 	upperLimitBits = ceil(log(max) / log(2));
 	upperLimitBytes = (LONG) ceil(upperLimitBits/8);
 
-	/* Simple discard methods is basically to produce 
-	   random LONG until it fits in out 0..MAX range
-	   */
 	while(1) {
 		LONG retVal;
 		randInput = 0L; /* overwrite whatever was there */
