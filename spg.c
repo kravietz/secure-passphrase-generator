@@ -83,20 +83,21 @@ const WCHAR g_szClassName[] = L"myWindowClass";
  */
 LONG rand_index(IN HWND hwnd, IN HCRYPTPROV hCryptProv, IN LONG max) {
 	OUT LONG randInput;	
-	static LONG iCallsNum = 0, iTotalLoopsNum = 0;
+	static LONG iCallsNum = 0L, iTotalLoopsNum = 0L;
 	static DOUBLE iLoopsAvg = 0.0;
 	static LONG iContinousRndTest = 0L;
 	LONG upperLimitBytes;
-	LONG loops = 0;
-	DOUBLE upperLimitBits;
+	LONG loops = 0L;
+	DOUBLE upperLimitBits; /* because ceil() returns DOUBLE */
 	
-	upperLimitBits = ceil(log(max) / log(2));
-	upperLimitBytes = (LONG) ceil(upperLimitBits/8);
+	upperLimitBits = ceil(log(max-1) / log(2)); // how many bits are needed to store max, need to use log(2) as log() is base e
+	upperLimitBytes = (LONG) ceil(upperLimitBits/8); // how many bytes
 
+	/* Fetch random bytes until it's lower than desired range */
 	while(1) {
 		LONG retVal;
 		randInput = 0L; /* overwrite whatever was there */
-		retVal = CryptGenRandom(hCryptProv, upperLimitBytes, (BYTE *) &randInput);
+		retVal = CryptGenRandom(hCryptProv, upperLimitBytes, (BYTE *) &randInput); /* random bytes to randInput */
 		ERRCHECK((!retVal), L"CryptGenRandom")
 		/* FIPS 140-2 p. 44 Continuous random number generator test */
 		/* Check if previous number wasn't the same as current */
@@ -126,7 +127,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_CREATE:
 			{
 				// Create windows on first run
-				HMENU hMenu = NULL, hSubMenu = NULL;
+				HMENU hMenu = NULL;
+				HMENU hSubMenu = NULL;
 				HFONT hfDefault = NULL;
 				HWND hEdit = NULL;
 				HWND hStatus = NULL;
@@ -139,7 +141,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				ERRCHECK((hSubMenu==NULL), L"Cannot create submenu")
 				AppendMenu(hSubMenu, MF_STRING, ID_LANG_PL, L"&Polish");
 				AppendMenu(hSubMenu, MF_STRING, ID_LANG_EN, L"&English");
-				AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, L"&Dictionary");
+				AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT_PTR) hSubMenu, L"&Dictionary");
 				AppendMenu(hMenu, MF_STRING | MF_POPUP, ID_ABOUT, L"&About");
 
 				SetMenu(hwnd, hMenu);
