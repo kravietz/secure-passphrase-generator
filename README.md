@@ -3,7 +3,7 @@
 
 SPG is a simple GUI program to generate random passphrases out of dictionaries in various languages. These passphrases are both easier to remember and stronger than most classical passwords composed of alphanumeric characters.
 
-Currently Polish and English dictionaries are included. They are built into the binary, so there is no installer, no configuration files etc. To use, just download and run.
+Currently Polish and English dictionaries are included. They are built into the binary, so there is no installer, no configuration files etc. To use, just download and run. See [here](http://ipsec.pl/passphrase) for more details.
 
 # Functional details
 
